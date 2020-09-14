@@ -1,8 +1,8 @@
-# (TODO: your game's title)
+# Road Burner
 
-Author: (TODO: your name)
+Author: Pavan Paravasthu
 
-Design: (TODO: In two sentences or fewer, describe what is new and interesting about your game.)
+Design: Drive along the road using the arrow keys. Press space to turn on the after burner and destroy your opponents.
 
 Screen Shot:
 
@@ -11,6 +11,8 @@ Screen Shot:
 How Your Asset Pipeline Works:
 
 (TODO: describe the steps in your asset pipeline, from source files to tiles/backgrounds/whatever you upload to the PPU466.)
+1. Used GIMP to create an 8x8 car sprite
+2. Ran a python script to convert it into the tile pattern arrays
 
 How To Play:
 

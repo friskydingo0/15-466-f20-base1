@@ -1,0 +1,13 @@
+- Make an asset pipeline
+    Read PPU466 code -- DONE
+    Create a sample PNG for converting -- DONE
+    Convert PNG to a sprite -- 
+    
+
+- Create a simple design for the game
+    Chicken farmer?
+    Platformer?
+    Road fighter?
+
+- Load sprites into memory for use in the game
+    Write a Load<T> for loading the sprites

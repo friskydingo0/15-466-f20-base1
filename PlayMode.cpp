@@ -8,6 +8,8 @@
 
 #include <random>
 
+#include "load_save_png.hpp"
+
 PlayMode::PlayMode() {
 	//TODO:
 	// you *must* use an asset pipeline of some sort to generate tiles.
@@ -49,31 +51,77 @@ PlayMode::PlayMode() {
 	}
 
 	//use sprite 32 as a "player":
-	ppu.tile_table[32].bit0 = {
-		0b01111110,
-		0b11111111,
-		0b11111111,
-		0b11111111,
-		0b11111111,
-		0b11111111,
-		0b11111111,
-		0b01111110,
+	// ppu.tile_table[32].bit0 = {
+	// 	0b01111110,
+	// 	0b11111111,
+	// 	0b11111111,
+	// 	0b11111111,
+	// 	0b11111111,
+	// 	0b11111111,
+	// 	0b00100100,
+	// 	0b00000000,
+	// };
+	// ppu.tile_table[32].bit1 = {
+	// 	0b00000000,
+	// 	0b00000000,
+	// 	0b00011000,
+	// 	0b00100100,
+	// 	0b00000000,
+	// 	0b00100100,
+	// 	0b00000000,
+	// 	0b01111110,
+	// };
+
+	std::vector< glm::u8vec4 > data = std::vector< glm::u8vec4 >();
+	glm::uvec2 size = glm::uvec2(8,8);
+
+	// Create a new vector of colors for the PNG. [0] is transparent black.
+	std::vector< glm::u8vec4 > colorPalette = std::vector< glm::u8vec4 >();
+	data.emplace_back(glm::u8vec4(0x00,0x00,0x00,0x00));
+
+	auto get_bit = [](const int &num){
+		return (num > 0 ? 1 : 0);
 	};
-	ppu.tile_table[32].bit1 = {
-		0b00000000,
-		0b00000000,
-		0b00011000,
-		0b00100100,
-		0b00000000,
-		0b00100100,
-		0b00000000,
-		0b00000000,
-	};
+
+	try
+	{
+		// Load the file for player sprite using provided load_save_png utility
+		load_png("assets/car-8x8.png", &size, &data, LowerLeftOrigin);
+
+		// Load its associated palette
+		load_png("assets/car-8x8-palette.png", &size, &colorPalette, LowerLeftOrigin);
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
+
+	// std::array<PPU466::Palette, 8> temp_palette;
+	std::copy(colorPalette.begin(), colorPalette.end(), ppu.palette_table[7].begin());
+	std::cout << "PNG data: " << data.size() << std::endl;
+
+	for (size_t i = 0; i < data.size(); i++)
+	{
+		// Find the color in the palette and split the bit indeces
+		for (size_t colorIndex = 0; colorIndex < colorPalette.size(); colorIndex++)
+		{
+			if (data.at(i) == colorPalette[colorIndex])
+			{
+				uint8_t bit1 = (colorIndex >> 1) & 1;
+				uint8_t bit0 = (colorIndex >> 0) & 1;
+
+				ppu.tile_table[32].bit0[i/8 + i%8] = (ppu.tile_table[32].bit0[i/8 + i%8] << 1) | bit0;
+				ppu.tile_table[32].bit1[i/8 + i%8] = (ppu.tile_table[32].bit1[i/8 + i%8] << 1) | bit1;
+			}
+		}
+	}
+
+	// --------- END Player sprite ---------
 
 	//makes the outside of tiles 0-16 solid:
 	ppu.palette_table[0] = {
 		glm::u8vec4(0x00, 0x00, 0x00, 0x00),
-		glm::u8vec4(0x00, 0x00, 0x00, 0xff),
+		glm::u8vec4(0x00, 0x00, 0x00, 0x00),
 		glm::u8vec4(0x00, 0x00, 0x00, 0x00),
 		glm::u8vec4(0x00, 0x00, 0x00, 0xff),
 	};
@@ -90,7 +138,7 @@ PlayMode::PlayMode() {
 	ppu.palette_table[7] = {
 		glm::u8vec4(0x00, 0x00, 0x00, 0x00),
 		glm::u8vec4(0xff, 0xff, 0x00, 0xff),
-		glm::u8vec4(0x00, 0x00, 0x00, 0xff),
+		glm::u8vec4(0x00, 0x00, 0xff, 0xff),
 		glm::u8vec4(0x00, 0x00, 0x00, 0xff),
 	};
 
@@ -197,7 +245,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	ppu.sprites[0].attributes = 7;
 
 	//some other misc sprites:
-	for (uint32_t i = 1; i < 63; ++i) {
+	for (uint32_t i = 1; i < 5; ++i) {
 		float amt = (i + 2.0f * background_fade) / 62.0f;
 		ppu.sprites[i].x = int32_t(0.5f * PPU466::ScreenWidth + std::cos( 2.0f * M_PI * amt * 5.0f + 0.01f * player_at.x) * 0.4f * PPU466::ScreenWidth);
 		ppu.sprites[i].y = int32_t(0.5f * PPU466::ScreenHeight + std::sin( 2.0f * M_PI * amt * 3.0f + 0.01f * player_at.y) * 0.4f * PPU466::ScreenWidth);
