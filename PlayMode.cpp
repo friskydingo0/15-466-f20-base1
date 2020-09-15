@@ -74,10 +74,9 @@ PlayMode::PlayMode() {
 
 	std::vector< glm::u8vec4 > data = std::vector< glm::u8vec4 >();
 	glm::uvec2 size = glm::uvec2(8,8);
-
+	glm::uvec2 palette_size = glm::uvec2(1,4);
 	// Create a new vector of colors for the PNG. [0] is transparent black.
 	std::vector< glm::u8vec4 > colorPalette = std::vector< glm::u8vec4 >();
-	data.emplace_back(glm::u8vec4(0x00,0x00,0x00,0x00));
 
 	auto get_bit = [](const int &num){
 		return (num > 0 ? 1 : 0);
@@ -89,7 +88,7 @@ PlayMode::PlayMode() {
 		load_png("assets/car-8x8.png", &size, &data, LowerLeftOrigin);
 
 		// Load its associated palette
-		load_png("assets/car-8x8-palette.png", &size, &colorPalette, LowerLeftOrigin);
+		load_png("assets/car-8x8-palette.png", &palette_size, &colorPalette, LowerLeftOrigin);
 	}
 	catch(const std::exception& e)
 	{
@@ -97,24 +96,40 @@ PlayMode::PlayMode() {
 	}
 
 	// std::array<PPU466::Palette, 8> temp_palette;
-	std::copy(colorPalette.begin(), colorPalette.end(), ppu.palette_table[7].begin());
+	
+	// Write asserts
+	std::cout << std::hex;
+	for (auto &col : ppu.palette_table[7])
+	{
+		std::cout << int(col.r) << "|" << int(col.g) << "|" << int(col.b) << "|" << int(col.a) << std::endl;
+	}
+	
 	std::cout << "PNG data: " << data.size() << std::endl;
-
-	for (size_t i = 0; i < data.size(); i++)
+	
+	// Not enough paranoia
+	for (int i = 0; i < data.size(); i++)
 	{
 		// Find the color in the palette and split the bit indeces
 		for (size_t colorIndex = 0; colorIndex < colorPalette.size(); colorIndex++)
 		{
-			if (data.at(i) == colorPalette[colorIndex])
+			if (data[i] == colorPalette[colorIndex])
 			{
 				uint8_t bit1 = (colorIndex >> 1) & 1;
 				uint8_t bit0 = (colorIndex >> 0) & 1;
+				std::cout << colorIndex << "-" << int(bit1) << int(bit0) << "|";
 
-				ppu.tile_table[32].bit0[i/8 + i%8] = (ppu.tile_table[32].bit0[i/8 + i%8] << 1) | bit0;
-				ppu.tile_table[32].bit1[i/8 + i%8] = (ppu.tile_table[32].bit1[i/8 + i%8] << 1) | bit1;
+				ppu.tile_table[32].bit0[i/8] = (ppu.tile_table[32].bit0[i/8] << 1) | bit0;
+				ppu.tile_table[32].bit1[i/8] = (ppu.tile_table[32].bit1[i/8] << 1) | bit1;
 			}
 		}
+		if ((i+1) % 8 == 0) {
+			std::cout << std::endl;
+		}
 	}
+	
+	
+	colorPalette[0] = glm::u8vec4(0x00,0x00,0x00,0x00);
+	std::copy(colorPalette.begin(), colorPalette.end(), ppu.palette_table[7].begin());
 
 	// --------- END Player sprite ---------
 
@@ -135,12 +150,12 @@ PlayMode::PlayMode() {
 	};
 
 	//used for the player:
-	ppu.palette_table[7] = {
-		glm::u8vec4(0x00, 0x00, 0x00, 0x00),
-		glm::u8vec4(0xff, 0xff, 0x00, 0xff),
-		glm::u8vec4(0x00, 0x00, 0xff, 0xff),
-		glm::u8vec4(0x00, 0x00, 0x00, 0xff),
-	};
+	// ppu.palette_table[7] = {
+	// 	glm::u8vec4(0x00, 0x00, 0x00, 0x00),
+	// 	glm::u8vec4(0xff, 0xff, 0x00, 0xff),
+	// 	glm::u8vec4(0x00, 0x00, 0xff, 0xff),
+	// 	glm::u8vec4(0x00, 0x00, 0x00, 0xff),
+	// };
 
 	//used for the misc other sprites:
 	ppu.palette_table[6] = {

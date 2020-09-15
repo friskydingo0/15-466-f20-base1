@@ -2,7 +2,11 @@
     Read PPU466 code -- DONE
     Create a sample PNG for converting -- DONE
     Convert PNG to a sprite -- 
-    
+		Read PNG data -- DONE
+		Write to binary file -- 
+	Load sprite
+		Read from binary file
+		Update data structures with the sprites
 
 - Create a simple design for the game
     Chicken farmer?

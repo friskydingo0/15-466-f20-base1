@@ -73,7 +73,7 @@ if $(OS) = NT { #Windows
 GAME_NAMES =
 	PlayMode
 	PPU466
-	main
+	build_assets
 	load_save_png
 	gl_compile_program
 	Mode
@@ -85,4 +85,4 @@ LOCATE_TARGET = objs ; #put objects in 'objs' directory
 Objects $(GAME_NAMES:S=.cpp) ;
 
 LOCATE_TARGET = dist ; #put main in 'dist' directory
-MainFromObjects game : $(GAME_NAMES:S=$(SUFOBJ)) ;
+MainFromObjects build_assets : $(GAME_NAMES:S=$(SUFOBJ)) ;
