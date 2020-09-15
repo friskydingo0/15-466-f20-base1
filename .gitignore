@@ -5,3 +5,4 @@ dist/game.pdb
 dist/SDL2.dll
 dist/game
 dist/game.exe
+.vscode/c_cpp_properties.json

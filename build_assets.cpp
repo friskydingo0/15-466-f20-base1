@@ -1,7 +1,8 @@
 #include <iostream>
+#include <fstream>
 
 #include "load_save_png.hpp"
-#include "PPU466.hpp"
+#include "DataUtils.hpp"
 #include "read_write_chunk.hpp"
 
 #include <glm/glm.hpp>
@@ -36,7 +37,7 @@ int main(int argc, char **argv)
 	
 	std::cout << "PNG data: " << data.size() << std::endl;
 	
-	// Jim : Not enough paranoia
+	// Jim : Not enough paranoia (?)
 	for (int i = 0; i < data.size(); i++)
 	{
 		// Find the color in the palette and split the bit indeces
@@ -77,16 +78,16 @@ int main(int argc, char **argv)
 	{
 		PPU466::Palette color_palette;
 		PPU466::Tile sprite_tile;
-	} sprite_data;
-	
-	sprite_data.color_palette = temp_palette;
-	sprite_data.sprite_tile = temp_tile;
+	} sprite_data = {temp_palette, temp_tile};
 
-	std::ofstream out("player_sprite" + ".dat", std::ios::binary);
-
-	// Using read/write functions from read_write_chunk.hpp
+	std::vector< SpriteData > sprite_data_vec;
+	sprite_data_vec.emplace_back(sprite_data);
 	
-	// write_chunk("poop", &sprite_data, <some file ptr>)
+	// Referring this https://github.com/15-466/15-466-f19-base1/blob/master/pack-sprites.cpp
+	std::ofstream out("dist/assets/player_sprite.dat", std::ios::out);
+	write_chunk("car1", sprite_data_vec, &out);
+
+	std::cout << "Finished building assets" << std::endl;
 
 	return 0;
 }
