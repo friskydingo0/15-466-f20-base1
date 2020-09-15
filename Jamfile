@@ -69,20 +69,32 @@ if $(OS) = NT { #Windows
 #---- build ----
 #This is the part of the file that tells Jam how to build your project.
 
+# Uncomment this to use for building sprite converter tool
+#GAME_NAMES =
+#	PPU466
+#	build_assets
+#	load_save_png
+#	gl_compile_program
+#	GL
+#	Load
+#	DataUtils
+#	;
+
 #Store the names of all the .cpp files to build into a variable:
 GAME_NAMES =
 	PlayMode
 	PPU466
-	build_assets
+	main
 	load_save_png
 	gl_compile_program
 	Mode
 	GL
 	Load
+	DataUtils
 	;
 
 LOCATE_TARGET = objs ; #put objects in 'objs' directory
 Objects $(GAME_NAMES:S=.cpp) ;
 
 LOCATE_TARGET = dist ; #put main in 'dist' directory
-MainFromObjects build_assets : $(GAME_NAMES:S=$(SUFOBJ)) ;
+MainFromObjects game : $(GAME_NAMES:S=$(SUFOBJ)) ;

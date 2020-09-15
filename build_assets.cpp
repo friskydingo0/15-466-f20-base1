@@ -74,17 +74,13 @@ int main(int argc, char **argv)
 	// ------------- End Read PNG for pixel data -----------------
 
 	// Write the sprite data to a file
-	struct SpriteData
-	{
-		PPU466::Palette color_palette;
-		PPU466::Tile sprite_tile;
-	} sprite_data = {temp_palette, temp_tile};
+	DataUtils::SpriteData sprite_data = { temp_palette, temp_tile };
 
-	std::vector< SpriteData > sprite_data_vec;
+	std::vector< DataUtils::SpriteData > sprite_data_vec;
 	sprite_data_vec.emplace_back(sprite_data);
 	
 	// Referring this https://github.com/15-466/15-466-f19-base1/blob/master/pack-sprites.cpp
-	std::ofstream out("dist/assets/player_sprite.dat", std::ios::out);
+	std::ofstream out("dist/assets/player_sprite.dat", std::ios::binary);
 	write_chunk("car1", sprite_data_vec, &out);
 
 	std::cout << "Finished building assets" << std::endl;
